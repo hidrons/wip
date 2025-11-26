@@ -5,7 +5,6 @@ function love.load()
  world = wf.newWorld(0, 0)
 
  world:addCollisionClass('plr')
- world:addCollisionClass('enemy')
 
  world:setQueryDebugDrawing(true)  
 ----------------------------------- 
@@ -20,16 +19,22 @@ plr.collider = world:newBSGRectangleCollider(200, 200, 40, 50, 10)
 plr.collider:setFixedRotation(true)
 plr.collider:setCollisionClass('plr')
 
-px, py = plr.collider:getPosition() 
 -----------------------------------
-
 
 
 end 
 
 
 
+
+
+
+
 function love.update(dt)
+
+px, py = plr.collider:getPosition() 
+
+spawn_proj = false  
 
 --velocities for the player's collider-- 
  vx = 0
@@ -64,6 +69,15 @@ world:update(dt)
 plr.x = plr.collider:getX() 
 plr.y = plr.collider:getY() 
 ----------------------------------------------------------------
+
+ if spawn_proj == true then
+
+      pvx = 0 
+      pvy = 0
+
+      pvx = proj.speed 
+ end 
+
 end 
 
 
@@ -80,5 +94,24 @@ end
 
 function love.keypressed(key)
 
+--projectile testing-------- 
+ if key == 'space' then   
+   spawn_proj = true
+ end
+
+ if spawn_proj == true then 
+    --projectile properties----------------------------------------
+    proj = {} 
+    proj.x = px
+    proj.y = py
+    proj.speed = 130 
+
+    if spawn_proj == true then 
+        proj.collider = world:newCircleCollider(proj.x, proj.y, 10)
+        proj.collider:setLinearVelocity(pvx, pvy)
+    end
+---------------------------------------------------------------
+---------------------------- 
+ end
 
 end
