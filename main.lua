@@ -9,7 +9,7 @@ function love.load()
  world:setQueryDebugDrawing(true)  
 ----------------------------------- 
 
---player properties----------------
+--player properties------------
 
 plr = {} 
 plr.x = 100 
@@ -22,11 +22,8 @@ plr.collider:setCollisionClass('plr')
 -----------------------------------
 
 
+
 end 
-
-
-
-
 
 
 
@@ -34,7 +31,6 @@ function love.update(dt)
 
 px, py = plr.collider:getPosition() 
 
-spawn_proj = false  
 
 --velocities for the player's collider-- 
  vx = 0
@@ -70,13 +66,6 @@ plr.x = plr.collider:getX()
 plr.y = plr.collider:getY() 
 ----------------------------------------------------------------
 
- if spawn_proj == true then
-
-      pvx = 0 
-      pvy = 0
-
-      pvx = proj.speed 
- end 
 
 end 
 
@@ -94,24 +83,6 @@ end
 
 function love.keypressed(key)
 
---projectile testing-------- 
- if key == 'space' then   
-   spawn_proj = true
- end
 
- if spawn_proj == true then 
-    --projectile properties----------------------------------------
-    proj = {} 
-    proj.x = px
-    proj.y = py
-    proj.speed = 130 
-
-    if spawn_proj == true then 
-        proj.collider = world:newCircleCollider(proj.x, proj.y, 10)
-        proj.collider:setLinearVelocity(pvx, pvy)
-    end
----------------------------------------------------------------
----------------------------- 
- end
 
 end
