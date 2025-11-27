@@ -83,11 +83,12 @@ plr.y = plr.collider:getY()
 --projectile config--------------------------------------------------
 function shoot() 
 
+    --projectile properties-------
     proj = {}
     proj.x = plr.x + 30  
     proj.y = plr.y
     proj.rad = 10 
-
+    ------------------------------
 
     --projectile direction----------------------
     if plr.dir == "left" then 
@@ -113,16 +114,17 @@ function shoot()
     end 
     --------------------------------------------- 
 
-    --simple collision detection for projectiles and enemies--
-    if proj.collider:enter('dummy') then 
-        enemy.collider:destroy()
-    end  
+      
 
 
     -----------------------------------------------------------
 end
 --------------------------------------------------------------------- 
 
+--simple collision detection for projectiles and enemies--
+    if proj.collider:enter('dummy') then 
+        enemy.collider:destroy()
+    end
 
 end 
 
