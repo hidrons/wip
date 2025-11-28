@@ -7,6 +7,7 @@ function love.load()
  world:addCollisionClass('plr')
  world:addCollisionClass('proj')
  world:addCollisionClass('dummy')
+ world:addCollisionClass('test_weapon')
 
  world:setQueryDebugDrawing(true)  
 ----------------------------------- 
@@ -17,20 +18,39 @@ plr = {}
 plr.x = 100 
 plr.y = 100 
 plr.speed = 200 
-plr.collider = world:newBSGRectangleCollider(200, 200, 40, 50, 10)
+plr.collider = world:newBSGRectangleCollider(100, 200, 40, 50, 10)
 plr.collider:setFixedRotation(true)
 plr.collider:setCollisionClass('plr')
 plr.dir = "left"
+
 -----------------------------------
 
 --enemy properties-------------------------------------------
-enemy = {} 
-enemy.collider = world:newRectangleCollider(200, 200, 50, 50)
-enemy.x = enemy.collider:getX() 
-enemy.y = enemy.collider:getY() 
-enemy.collider:setType('static')
-enemy.collider:setCollisionClass('dummy')
+dummy = {} 
+dummy.collider = world:newRectangleCollider(200, 200, 50, 50)
+dummy.x = dummy.collider:getX() 
+dummy.y = dummy.collider:getY() 
+dummy.collider:setType('static')
+dummy.collider:setCollisionClass('dummy')
+dummy.hp = 20
 -------------------------------------------------------------
+
+--projectile properties--
+ proj = {}
+ proj.x = plr.x + 30  
+ proj.y = plr.y 
+ proj.rad = 10
+-------------------------
+
+--testing weapons for melee combat---------------------------------
+test_weapon = {} 
+test_weapon.range_x = 60
+test_weapon.range_y = 60
+test_weapon.damage = 10  
+test_weapon.collider = world:newRectangleCollider(400, 400, 30, 20) 
+test_weapon.collider:setCollisionClass('test_weapon')
+test_weapon.equiped = false
+-------------------------------------------------------------------
 
 end 
 
@@ -38,10 +58,20 @@ end
 
 function love.update(dt)
 
+
+--melee table for flexability if i need to code switching the weapon--
+--melee = {} 
+--melee.range_x = nil 
+--weapon.range_y = nil 
+----------------------------------------------------------------------
+
+--player's current position--------
 px, py = plr.collider:getPosition() 
+-----------------------------------
 
 --so the enemy health is constantly updated duh--
-enemy.health = 60
+
+plr.hp = 30
 -------------------------------------------------
 
 --velocities for the player's collider-- 
@@ -69,63 +99,33 @@ elseif love.keyboard.isDown("s") then
      plr.dir = "down" 
 end 
 
---------------------------------------------------------
+------------------------------------------------------- 
+
+
 --update the world and set the collider velocites and position--
 plr.collider:setLinearVelocity(vx, vy)
 
 world:update(dt)
+
+if dummy.hp < 1 then 
+    dummy.collider:destroy()
+end 
+
+--equiping the test weapon---------------
+if plr.collider:enter('test_weapon') then 
+    test_weapon.equiped = true
+    test_weapon.collider:destroy()
+end 
+
+-----------------------------------------
+
+
+
 plr.x = plr.collider:getX() 
 plr.y = plr.collider:getY() 
-----------------------------------------------------------------
 
 
-
---projectile config--------------------------------------------------
-function shoot() 
-
-    --projectile properties-------
-    proj = {}
-    proj.x = plr.x + 30  
-    proj.y = plr.y
-    proj.rad = 10 
-    ------------------------------
-
-    --projectile direction----------------------
-    if plr.dir == "left" then 
-        proj.collider = world:newCircleCollider(proj.x - 60, proj.y, proj.rad)
-        proj.collider:setLinearVelocity(-300, 0)
-        proj.collider:setCollisionClass('proj')
-
-    elseif plr.dir == "right" then 
-        proj.collider = world:newCircleCollider(proj.x + 1, proj.y, proj.rad)
-        proj.collider:setLinearVelocity(300, 0)
-        proj.collider:setCollisionClass('proj')
-    end 
-
-    if plr.dir == "up" then 
-        proj.collider = world:newCircleCollider(proj.x - 30, proj.y - 30, proj.rad)
-        proj.collider:setLinearVelocity(0, -300)
-        proj.collider:setCollisionClass('proj')
-
-    elseif plr.dir == "down" then 
-        proj.collider = world:newCircleCollider(proj.x - 30, proj.y + 30, proj.rad)
-        proj.collider:setLinearVelocity(0, 300)
-        proj.collider:setCollisionClass('proj')
-    end 
-    --------------------------------------------- 
-
-      
-
-
-    -----------------------------------------------------------
-end
 --------------------------------------------------------------------- 
-
---simple collision detection for projectiles and enemies--
-    if proj.collider:enter('dummy') then 
-        enemy.collider:destroy()
-    end
-
 end 
 
 
@@ -134,6 +134,14 @@ function love.draw()
 
 --does this even need explaining?--
 world:draw()
+
+if test_weapon.equiped == true then 
+    love.graphics.print("true")
+else 
+    love.graphics.print("false")
+end 
+
+love.graphics.print(dummy.hp, 40, 0)
 -----------------------------------
 
 
@@ -143,8 +151,11 @@ end
 
 function love.keypressed(key)
 
- if key == 'space' then 
-    shoot() 
- end 
-
+    if test_weapon.equiped == true and key == 'space' then 
+            local melee_detect = world:queryCircleArea(px, py, test_weapon.range_x, {'dummy'})
+            if #melee_detect > 0 then 
+                dummy.hp = dummy.hp - test_weapon.damage 
+            end 
+        --end 
+    end  
 end
