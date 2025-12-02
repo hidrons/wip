@@ -1,0 +1,27 @@
+i need to setup a timer for attacking cuz i cant have the player be able to spam attack forever
+
+1- the timer gotta be 1 second
+2- ill use a while loop to make the timer 
+
+my brain literally feels so foggy rn so i need to map this out because i can NOT think straight rn 
+
+--executing: 
+1- setup a time variable, that will be the limit for the while loop 
+2- setup a timer specifically for the test weapon
+3- setup a while loop that looks like: 
+   
+   if attacked then timer = 0 
+
+   while timer < time do 
+     timer = timer + 0.1 
+   end 
+
+   if timer == 1 then 
+    can_attack = true 
+   end 
+
+i literally feel so tired rn i dont even know how to make a while loop lmao 
+
+
+--entry 2: its like december 2nd today so yeah a while loop doesnt work in this context cuz like it'd be already setup when i boot up the game, dont know much abot loops in lua anyways lolol, decided to use an if statment cuz like why not and it actually worked lmao
+

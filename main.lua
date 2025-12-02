@@ -33,6 +33,7 @@ dummy.y = dummy.collider:getY()
 dummy.collider:setType('static')
 dummy.collider:setCollisionClass('dummy')
 dummy.hp = 20
+
 -------------------------------------------------------------
 
 --projectile properties--
@@ -49,8 +50,11 @@ test_weapon.range_y = 60
 test_weapon.damage = 10  
 test_weapon.collider = world:newRectangleCollider(400, 400, 30, 20) 
 test_weapon.collider:setCollisionClass('test_weapon')
-test_weapon.equiped = false
+test_weapon.equipped = false
+test_weapon.timer = 0 
 -------------------------------------------------------------------
+
+time = 1.5 --attack cooldown-- 
 
 end 
 
@@ -58,21 +62,15 @@ end
 
 function love.update(dt)
 
+can_attack = true 
 
---melee table for flexability if i need to code switching the weapon--
---melee = {} 
---melee.range_x = nil 
---weapon.range_y = nil 
-----------------------------------------------------------------------
+
 
 --player's current position--------
 px, py = plr.collider:getPosition() 
 -----------------------------------
 
---so the enemy health is constantly updated duh--
-
 plr.hp = 30
--------------------------------------------------
 
 --velocities for the player's collider-- 
  vx = 0
@@ -102,18 +100,49 @@ end
 ------------------------------------------------------- 
 
 
+--direction configuration---------------------------
+
+
+if plr.dir == "left" then 
+    px = px - 30 
+
+elseif plr.dir == "right" then 
+    px = px + 30 
+end 
+
+if plr.dir == "up" then 
+    py = py - 30 
+
+elseif plr.dir == "down" then 
+    py = py + 30 
+end  
+
+
+
+
+
+
+----------------------------------------------------
 --update the world and set the collider velocites and position--
 plr.collider:setLinearVelocity(vx, vy)
 
 world:update(dt)
 
-if dummy.hp < 1 then 
-    dummy.collider:destroy()
+
+--attack cooldown config--------
+if test_weapon.timer < time then 
+    can_attack = false  
+    test_weapon.timer = test_weapon.timer + 0.1
+    if test_weapon.timer == time then 
+        can_attack = true 
+    end 
 end 
+--------------------------------
+
 
 --equiping the test weapon---------------
 if plr.collider:enter('test_weapon') then 
-    test_weapon.equiped = true
+    test_weapon.equipped = true
     test_weapon.collider:destroy()
 end 
 
@@ -126,6 +155,7 @@ plr.y = plr.collider:getY()
 
 
 --------------------------------------------------------------------- 
+
 end 
 
 
@@ -135,27 +165,29 @@ function love.draw()
 --does this even need explaining?--
 world:draw()
 
-if test_weapon.equiped == true then 
-    love.graphics.print("true")
-else 
-    love.graphics.print("false")
-end 
 
-love.graphics.print(dummy.hp, 40, 0)
+love.graphics.print(test_weapon.timer)
 -----------------------------------
 
 
 end 
-
+ 
 
 
 function love.keypressed(key)
 
-    if test_weapon.equiped == true and key == 'space' then 
-            local melee_detect = world:queryCircleArea(px, py, test_weapon.range_x, {'dummy'})
-            if #melee_detect > 0 then 
-                dummy.hp = dummy.hp - test_weapon.damage 
+    if test_weapon.equipped == true and can_attack == true and key == 'space' then
+        test_weapon.timer = 0
+        local detected = world:queryCircleArea(px, py, 30, {'dummy'})
+
+        if #detected > 0 then 
+            dummy.hp = dummy.hp - test_weapon.damage
+
+            if dummy.hp < 1 then 
+                dummy.collider:destroy() 
             end 
-        --end 
-    end  
+        end 
+    end 
 end
+
+
